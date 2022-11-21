@@ -34,18 +34,11 @@ KFOLD = 5
 data_dir = './data/Graz'
 subject = 'B04'  #'B01'
 
-dataset1 = scipy.io.loadmat('D:\PhD Ain Shams\Dr Seif\GANs\Dataset BCI competition iv\Dr azab\A01E.mat', struct_as_record=True)
-# print(dataset1.keys())
-# dataset2 = scipy.io.loadmat('./data/Graz/B01T.mat', struct_as_record=True)
-# print(dataset2.keys())
-# mat_T = raw=mne.io.read_raw_gdf('D:\PhD Ain Shams\Dr Seif\GANs\Dataset BCI competition iv\BCI_IV_2b_gdf\B0101T.gdf')
-# mat_E = raw=mne.io.read_raw_gdf('D:\PhD Ain Shams\Dr Seif\GANs\Dataset BCI competition iv\BCI_IV_2b_gdf\B0104E.gdf')
-
  # make folder for results
-makedirs('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\sub_{}\CL1'.format(subject), exist_ok=True) 
-makedirs('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\sub_{}\CL2'.format(subject), exist_ok=True) 
-makedirs('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL1_3ch', exist_ok=True) 
-makedirs('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL2_3ch', exist_ok=True) 
+makedirs('spectrogram\sec_2\Test\sub_{}\CL1'.format(subject), exist_ok=True) 
+makedirs('spectrogram\sec_2\Test\sub_{}\CL2'.format(subject), exist_ok=True) 
+makedirs('spectrogram\sec_2\Test\CL1_3ch', exist_ok=True) 
+makedirs('spectrogram\sec_2\Test\CL2_3ch', exist_ok=True) 
 
 # initialize the data-structure, but do _not_ load the data yet
 grazb_data = gumpy.data.GrazB(data_dir, subject,  True)
@@ -62,10 +55,6 @@ grazb_data_test = gumpy.data.GrazB(data_dir, subject, T = False)
 x_test, y_test = utilss.load_preprocess_data(grazb_data_test, True, LOWCUT,
                                               HIGHCUT, W0, Q, ANTI_DRIFT, CLASS_COUNT, CUTOFF,
                                               AXIS, FS, T = False)
-
-# x_subject = x_augmented
-# y_subject = y_augmented
-# x_subject = np.rollaxis(x_subject, 2, 1)
 def MI_4sec_data(x,y):
     # sub_data = np.rollaxis(x, 2, 1)
     # samples_win = 2*FS      # 2sec window
@@ -102,7 +91,6 @@ def get_concat_v(im1, im2, im3):
     return dst
 #%%
 from scipy import signal
-# import scipy.signal 
 
 
 
@@ -125,14 +113,13 @@ def stft_data(X, window_size=256, draw=False, cl = 1):
     f, t, Zxx = signal.stft(X[0,:,0], fs=fs,  nperseg=window_size, noverlap=1)
     num_freq= f.shape[0]
     num_time= t.shape[0]
-    #Z_mean =  np.empty((Zxx.shape[0],Zxx.shape[1]))
     ch_stft= np.empty((int(num_trials), int(num_freq),int(num_time)))
     
     for i in range(num_trials):
         for j in range(3):   
             f, t, Zxx = signal.stft(X[i,:,j], fs=fs,  nperseg= window_size, noverlap=1)
             ch_stft[i] = Zxx 
-            #print('ch_stft.shape ',ch_stft.shape)
+
             plt.figure(figsize=(12,5))
             if draw==True:
                 
@@ -140,28 +127,23 @@ def stft_data(X, window_size=256, draw=False, cl = 1):
                 plt.xlim(0,2)
                 plt.ylim(8,30)
                 plt.axis('off')
-                # plt.title('STFT Magnitude_ch:%d' %j )
-                # plt.ylabel('Frequency [Hz]')
-                # plt.xlabel('Time [sec]')
-                plt.savefig('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{3}_ch {1}_t{2} .png'.format(cl ,j, i, subject), bbox_inches= 'tight', pad_inches= 0)
+
+                plt.savefig('spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{3}_ch {1}_t{2} .png'.format(cl ,j, i, subject), bbox_inches= 'tight', pad_inches= 0)
                 plt.show() 
-        img26 = Image.open('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 0_t{1} .png' .format(cl , i, subject)) # Path to image
-        img28 = Image.open('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 1_t{1} .png' .format(cl , i, subject)) # Path to image
-        img30 = Image.open('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 2_t{1} .png' .format(cl , i, subject)) # Path to image
-        get_concat_v(img26, img28, img30).save('D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_2\Test\sub_{2}\CL{0}\cl{0} ch3_{2}_tr{1}.bmp' .format(cl , i, subject)) 
+        img26 = Image.open('spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 0_t{1} .png' .format(cl , i, subject)) # Path to image
+        img28 = Image.open('spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 1_t{1} .png' .format(cl , i, subject)) # Path to image
+        img30 = Image.open('spectrogram\sec_2\Test\CL{0}_3ch\cl{0} STFT_{2}_ch 2_t{1} .png' .format(cl , i, subject)) # Path to image
+        get_concat_v(img26, img28, img30).save('spectrogram\sec_2\Test\sub_{2}\CL{0}\cl{0} ch3_{2}_tr{1}.bmp' .format(cl , i, subject)) 
     
 
     return ch_stft, f , t
     #return Zxx, f, t 
 # #Apply the function
-# cl1_stft, num_freq, num_time =stft_data(MI_cl1,256,draw=True,cl = 1)
-# cl2_stft, num_freq, num_time =stft_data(MI_cl2,256,draw=True,cl = 2)
-# cl1_stft, num_freq, num_time =stft_data(MI_cl1_test,256,draw=True,cl = 1)
-# cl2_stft, num_freq, num_time =stft_data(MI_cl2_test,256,draw=True,cl = 2)
-# X_stft = {cl1: cl1_stft, cl2: cl2_stft}
-#print('cl1_stft.shape ',cl1_stft.shape)
-# print('f.shape ',num_freq.shape)
-# print('t.shape ',num_time.shape)
+cl1_stft, num_freq, num_time =stft_data(MI_cl1,256,draw=True,cl = 1)
+cl2_stft, num_freq, num_time =stft_data(MI_cl2,256,draw=True,cl = 2)
+cl1_stft, num_freq, num_time =stft_data(MI_cl1_test,256,draw=True,cl = 1)
+cl2_stft, num_freq, num_time =stft_data(MI_cl2_test,256,draw=True,cl = 2)
+
 
 
 
