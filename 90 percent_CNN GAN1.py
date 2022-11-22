@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Sat Oct 15 09:05:29 2022
 
@@ -45,11 +44,7 @@ n_epochs = 400
 cnn_batch_size = 9 
 cnn_epochs = 500
 Ad_times = 1
-nfolds = 0
-R_nfolds = [ 7,9 ]
 seed = 7
-
-subjects = ['sub_B06' , 'sub_B07' , 'sub_B08', 'sub_B09' ]    # , 'sub_B02' , 'sub_B03' , 'sub_B04', 'sub_B05' , 'sub_B06' , 'sub_B07' , 'sub_B08', 'sub_B09', 
 cnn_acc = list()
 GAN_acc = list()
 cnn2_acc = list()
@@ -57,8 +52,8 @@ GAN2_acc = list()
 total_cnn_acc=list()
 total_gan2_acc=list()
 
-img_folder =r'D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_4\{}'.format(subject) 
-img_folder_test =r'D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_4\Test\{}'.format(subject)   
+img_folder =r'BCI_IV_2b GAN\spectrogram\sec_4\{}'.format(subject) 
+img_folder_test =r'BCI_IV_2b GAN\spectrogram\sec_4\Test\{}'.format(subject)   
 
 def create_dataset(img_folder):       
     img_data_array=[]
@@ -90,17 +85,6 @@ x_ev,y_ev = create_dataset(img_folder_test)
 x0 = np.concatenate(( x_tr,x_ev ))   
 y0 = np.concatenate(( y_tr,y_ev ))  
 
-
-no_copy = 10 - (len(x0) % 10)
-x_copy = np.empty(( no_copy , IMG_HEIGHT, IMG_WIDTH,3)) 
-y_copy = np.empty((no_copy ))
-for s in range(no_copy):
-    x_copy[s] = x0[s]
-    y_copy[s] = y0[s]
-
-x =  np.concatenate((x0, x_copy))
-y = np.concatenate(( y0, y_copy))
-
 def fold_split(xdata,ydata,folds=10): 
     
     trainX = np.empty((int(folds),int (len(xdata)-(len(xdata)/folds)) , IMG_HEIGHT, IMG_WIDTH,3))
@@ -117,11 +101,7 @@ def fold_split(xdata,ydata,folds=10):
         i+=1
     return trainX, trainY, testX, testY
 
-# for subject in subjects:
-#     img_folder =r'D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_4\{}'.format(subject) 
-#     img_folder_test =r'D:\PhD Ain Shams\Dr Seif\GANs\python_ex\BCI_IV_2b GAN\spectrogram\sec_4\Test\{}'.format(subject) 
 for nfolds in range(2,3):
-# for nfolds in R_nfolds:
     # fix random seed for reproducibility
     tf.random.set_seed(seed)
     np.random.seed(seed)
@@ -178,15 +158,8 @@ for nfolds in range(2,3):
     def define_generator(latent_dim=100):
         model = Sequential(name="generator")
         model.add(Input(shape= latent_dim  , name='input_layer'))
-        model.add(Reshape((1, 1, latent_dim)))
-
-        # n_nodes = 256 * 4 * 4
-        # model.add(Dense(n_nodes, input_dim=latent_dim))
-        # model.add(LeakyReLU(alpha=0.2))
-        # model.add(Reshape((4, 4, 256)))
-
+        model.add(Reshape((1, 1, latent_dim))
         model.add(Conv2DTranspose(1024, 4, strides=4, padding='same', name='deconv_1'))
-    
         # upsample to 8x8
         model.add(Conv2DTranspose(512, (4,4), strides=(2,2), padding='same', name='deconv_2'))
         model.add(LeakyReLU(alpha=0.2, name='Leaky_ReLU_1'))
@@ -201,7 +174,6 @@ for nfolds in range(2,3):
         model.add(LeakyReLU(alpha=0.2, name='Leaky_ReLU_4'))
         # output layer
         model.add(Conv2D(3, (3,3), activation='tanh', padding='same', name='output_layer'))
-        # model.add(Conv2DTranspose(3, (3,3), strides=2, activation='tanh', padding='same'))
         return model
     #=================================================
     # define discriminator model
@@ -228,9 +200,7 @@ for nfolds in range(2,3):
         # add the discriminator
         model.add(d_model)
         # compile model
-        opt = Adam(learning_rate=0.0002, beta_1 = 0.5, beta_2 = 0.8) #, beta_2 = 0.8
-        # opt = SGD(learning_rate=0.002)
-
+        opt = Adam(learning_rate=0.0002, beta_1 = 0.5, beta_2 = 0.8) 
         model.compile(loss='binary_crossentropy', optimizer=opt)
         return model
     
@@ -555,72 +525,25 @@ for nfolds in range(2,3):
         plt.show()
         plt.close()
         
-    # model_training(x_train, y_train,'final_90/CNN_GAN/ep{3}_{0}_GAN_{1}_CNN2_model_f{2}_ad.h5'.format( subject, Ad_times, nfolds, epochs), create_cnn2(), '{1}_GAN_CNN2 Model accuracy fold {2} --> AD={0} \n'.format( Ad_times, subject, nfolds))        
-    # model_training(x_train, y_train,'final_90/{0} GAN_results/fold_{2}/CNN_GAN/ep{3}_batch{4}_{0}_GAN_{1}_CNN_model.h5'.format( subject, Ad_times, nfolds), create_cnn(), '{1}_GAN_CNN Model accuracy fold {2}--> AD={0} \n'.format( Ad_times, subject, nfolds))    
+    model_training(x_train, y_train,'final_90/CNN_GAN/ep{3}_{0}_GAN_{1}_CNN2_model_f{2}_ad.h5'.format( subject, Ad_times, nfolds, epochs), create_cnn2(), '{1}_GAN_CNN2 Model accuracy fold {2} --> AD={0} \n'.format( Ad_times, subject, nfolds))        
+    model_training(x_train, y_train,'final_90/{0} GAN_results/fold_{2}/CNN_GAN/ep{3}_batch{4}_{0}_GAN_{1}_CNN_model.h5'.format( subject, Ad_times, nfolds), create_cnn(), '{1}_GAN_CNN Model accuracy fold {2}--> AD={0} \n'.format( Ad_times, subject, nfolds))    
 
-    # model_training(trainX[nfolds], trainY[nfolds],'final_90/{0} GAN_results/fold_{1}/CNN/{0}_CNN_model.h5'.format( subject, nfolds), create_cnn(), '{0}_CNN Model accuracy fold {1} --  \n'.format(  subject, nfolds))        
-    # model_training(trainX[nfolds], trainY[nfolds],'final_90/CNN_GAN/{0}_CNN2_model_f{1}_ad.h5'.format( subject, nfolds), create_cnn2(), '{0}_CNN2 Model accuracy fold {1} --  \n'.format(  subject, nfolds))        
-   
-
-
-#%%======================================= 10 fold test with different batch no. ==========================
-#     def CNN_GAN_test(cnn=2):
-#         scores = list()
-    
-#         # for f in range(0,10):
-#         if cnn == 2 :
-#         # load the saved model
-#             model = load_model('final_90/CNN_GAN//ep{3}_batch{4}_{0}_GAN_{1}_CNN2_model_f{2}.h5'.format( subject, Ad_times, nfolds, epochs, batch))
-#             test_loss, test_acc= model.evaluate(testX[nfolds],testY[nfolds],verbose=0)
-#             print('GAN Test: ',nfolds,' fold Accuracy',test_acc)
-#             scores.append(test_acc)
-#             # model.save('final_90/CNN_GAN//ep{3}_batch{4}_{0}_GAN_{1}_CNN2_model_f{2}.h5'.format( subject, Ad_times, f, epochs, batch))
-#         elif cnn == 1:
-#             model = load_model('final_90/{0} GAN_results/fold_{2}/CNN_GAN/GAN_CNN models/{0}_GAN_{1}_CNN_model.h5'.format( subject, Ad_times, nfolds))
-#             test_loss, test_acc= model.evaluate(testX[nfolds],testY[nfolds],verbose=0)
-#             print('Test: ',nfolds,' fold Accuracy',test_acc)
-#             scores.append(test_acc)
-#         else:
-#             model = load_model('final_90/CNN_GAN/ep{2}_batch{3}_{0}_CNN2_model_f{1}.h5'.format( subject, nfolds, epochs, batch))
-#             test_loss, test_acc= model.evaluate(testX[nfolds],testY[nfolds],verbose=0)
-#             print('Test: ',nfolds,'Test fold Accuracy',test_acc)
-#             scores.append(test_acc)
-#             # model.save('final_90/CNN_GAN//ep{2}_batch{3}_{0}_CNN2_model_f{1}.h5'.format( subject, f, epochs, batch))
-    
-#         # print('>>>> {0} folds Accuracy: mean={1} std={2}, n={3}' .format (subject, mean(scores)*100, std(scores)*100, len(scores)))
-#         # print ('*************************************')
-#         ## box and whisker plots of results
-#         #plt.boxplot(scores)
-#         #plt.show()
-#         #plot_model(model, show_shapes=True, expand_nested=True)
-#         return scores
-    
-#     # sub_gan_acc = CNN_GAN_test(cnn=1)
-#     # total_gan_acc.append(sub_gan_acc)
-#     cnn2_folds_acc = CNN_GAN_test(cnn=3)
-    
-#     GAN2_folds_acc = CNN_GAN_test(cnn=2)
-#     # total_gan2_acc.append(sub_gan2_acc)
-    
-#     #  print('**** GAN Accuaracy: mean=%.3f std=%.3f, n=%d' % (mean(total_gan_acc)*100, std(total_gan_acc)*100, len(total_gan_acc)))
-#     #  print('**** Enhancement: mean=%.3f std=%.3f' % (mean(GAN_acc)*100 - mean(cnn_acc)*100, std(GAN_acc)*100 - std(cnn_acc)*100))
-    
-#     # print('**** GAN2 Accuaracy: mean=%.3f std=%.3f, n=%d' % (mean(total_gan2_acc)*100, std(total_gan2_acc)*100, len(total_gan2_acc)))
-# print('**** Enhancement: mean=%.3f std=%.3f' % (mean(GAN2_folds_acc)*100 - mean(cnn2_folds_acc)*100, std(GAN2_folds_acc)*100 - std(cnn2_folds_acc)*100))
+    model_training(trainX[nfolds], trainY[nfolds],'final_90/{0} GAN_results/fold_{1}/CNN/{0}_CNN_model.h5'.format( subject, nfolds), create_cnn(), '{0}_CNN Model accuracy fold {1} --  \n'.format(  subject, nfolds))        
+    model_training(trainX[nfolds], trainY[nfolds],'final_90/CNN_GAN/{0}_CNN2_model_f{1}_ad.h5'.format( subject, nfolds), create_cnn2(), '{0}_CNN2 Model accuracy fold {1} --  \n'.format(  subject, nfolds))        
+ acc)*100 - mean(cnn2_folds_acc)*100, std(GAN2_folds_acc)*100 - std(cnn2_folds_acc)*100))
 
 #%%======================================= 10 fold test ==========================
 # # for subject in subjects:
 def CNN_GAN_test(cnn=2):
     scores = list()
 
-    for f in range(0,2):
+    for f in range(0,10):
         if cnn == 2 :
         # load the saved model
             model = load_model('final_90/CNN_GAN/ep{3}_{0}_GAN_{1}_CNN2_model_f{2}.h5'.format( subject, Ad_times, f, epochs))
             test_loss, test_acc= model.evaluate(testX[f],testY[f],verbose=0)
             print('\nTest: ',f,' fold Accuracy',test_acc)
             scores.append(test_acc)
-            # model.save('final_90/CNN_GAN/{0}_GAN_{1}_CNN2_model_f{2}_.h5'.format( subject, Ad_times, f, epochs, batch))
         elif cnn == 1:
             model = load_model('final_90/{0} GAN_results/fold_{2}/CNN_GAN/GAN_CNN models/{0}_GAN_{1}_CNN_model.h5'.format( subject, Ad_times, f))
             test_loss, test_acc= model.evaluate(testX[f],testY[f],verbose=0)
@@ -636,22 +559,14 @@ def CNN_GAN_test(cnn=2):
     print('\n >>>> {0} folds Accuracy: mean={1} std={2}, n={3}' .format (subject, mean(scores)*100, std(scores)*100, len(scores)))
     print ('*************************************')
     ## box and whisker plots of results
-    #plt.boxplot(scores)
-    #plt.show()
-    #plot_model(model, show_shapes=True, expand_nested=True)
+    plt.boxplot(scores)
+    plt.show()
+    plot_model(model, show_shapes=True, expand_nested=True)
     return scores
 
-# sub_gan_acc = CNN_GAN_test(cnn=1)
-# total_gan_acc.append(sub_gan_acc)
-# cnn2_folds_acc = CNN_GAN_test(cnn=3)
+sub_gan_acc = CNN_GAN_test(cnn=1)
+cnn2_folds_acc = CNN_GAN_test(cnn=3)
+GAN2_folds_acc = CNN_GAN_test(cnn=2)
 
-# GAN2_folds_acc = CNN_GAN_test(cnn=2)
-# total_gan2_acc.append(sub_gan2_acc)
-
-#  print('**** GAN Accuaracy: mean=%.3f std=%.3f, n=%d' % (mean(total_gan_acc)*100, std(total_gan_acc)*100, len(total_gan_acc)))
-#  print('**** Enhancement: mean=%.3f std=%.3f' % (mean(GAN_acc)*100 - mean(cnn_acc)*100, std(GAN_acc)*100 - std(cnn_acc)*100))
-
-# print('**** GAN2 Accuaracy: mean=%.3f std=%.3f, n=%d' % (mean(total_gan2_acc)*100, std(total_gan2_acc)*100, len(total_gan2_acc)))
-
-# print('**** Enhancement: mean=%.3f std=%.3f' % (mean(GAN2_folds_acc)*100 - mean(cnn2_folds_acc)*100, std(GAN2_folds_acc)*100 - std(cnn2_folds_acc)*100))
+print('**** Enhancement: mean=%.3f std=%.3f' % (mean(GAN2_folds_acc)*100 - mean(cnn2_folds_acc)*100, std(GAN2_folds_acc)*100 - std(cnn2_folds_acc)*100))
 
