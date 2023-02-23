@@ -23,7 +23,6 @@ First, the program loads the raw data using the GrazB dataset location and subje
 
 2. Data Preprocessing
 Then, the loaded data is preprocessed using the following parameters:
-
 FS = 250
 LOWCUT = 8
 HIGHCUT = 30
@@ -31,6 +30,7 @@ ANTI_DRIFT = 0.5
 CUTOFF = 50.0
 Q = 30.0
 W0 = CUTOFF / (FS / 2)
+
 3. Data Augmentation
 The data is then augmented by GAN model.
 
