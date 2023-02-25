@@ -1,6 +1,4 @@
 # Dataset-BCI-competition-iv-2b
-
-Introduction
 This is a python code for extracting EEG signals from dataset 2b from competition iv, then it converts the data to spectrogram images to classify them using a CNN classifier.
 
 The code is designed to load and preprocess data, then pass it through a CNN classifier that was trained on the same dataset. The output of the classifier is then used to classify the data into two classes.
