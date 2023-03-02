@@ -49,8 +49,7 @@ cnn_acc = list()
 GAN_acc = list()
 cnn2_acc = list()
 GAN2_acc = list()
-total_cnn_acc=list()
-total_gan2_acc=list()
+
 
 img_folder =r'BCI_IV_2b GAN\spectrogram\sec_4\{}'.format(subject) 
 img_folder_test =r'BCI_IV_2b GAN\spectrogram\sec_4\Test\{}'.format(subject)   
